@@ -17,9 +17,27 @@ class Student
     phone.match?(/\A\+?\d{1,14}\z/)
   end
 
+   # Проверка правильности формата email
+  def self.valid_email?(email)
+    email.match?(/\A[^@\s]+@[^@\s]+\.[^@\s]+\z/)
+  end
+
+  # Проверка правильности формата telegram (начинается с @)
+  def self.valid_telegram?(telegram)
+    telegram.match?(/\A@[a-zA-Z0-9_]{5,32}\z/)
+  end
+
+  # Проверка правильности формата git (например, https://github.com/user/repo.git)
+  def self.valid_git?(git)
+    git.match?(/\Ahttps:\/\/github\.com\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+\.git\z/)
+  end
+
   # Метод валидации всех полей, включая номер телефона и обязательность контакта
   def validate
     raise "Некорректный номер телефона" if phone && !Student.valid_phone?(phone)
+    raise "Некорректный email" if email && !Student.valid_email?(email)
+    raise "Некорректный Telegram" if telegram && !Student.valid_telegram?(telegram)
+    raise "Некорректный Git" if git && !Student.valid_git?(git)
     raise "Должен быть хотя бы один контакт: телефон, Telegram, email" if [phone, telegram, email].all?(&:nil?)
     raise "Git должен быть указан" if git.nil?
   end
