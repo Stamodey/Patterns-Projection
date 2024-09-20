@@ -4,25 +4,47 @@ class Student
 
   # Инициализируем новый объект Student с заданными атрибутами
   def initialize(attributes = {})
-    self.id = attributes[:id]                   # Устанавливаем ID
-    self.last_name = attributes[:last_name]     # Устанавливаем Фамилию
-    self.first_name = attributes[:first_name]   # Устанавливаем Имя
-    self.middle_name = attributes[:middle_name] # Устанавливаем Отчество
-    set_optional_attributes(attributes)         # Устанавливаем необязательные атрибуты
+    self.last_name = attributes[:last_name] || raise("Фамилия обязательна")   # Устанавливаем Фамилию
+    self.first_name = attributes[:first_name] || raise("Имя обязательно")     # Устанавливаем Имя
+    self.middle_name = attributes[:middle_name] || raise("Отчество обязательно") # Устанавливаем Отчество
+    self.id = attributes[:id]                                                 # Устанавливаем ID
+    set_optional_attributes(attributes)                                       # Устанавливаем необязательные атрибуты
+    validate                                                                  # Проверка валидации
+  end
+
+  # Метод класса для проверки, является ли строка допустимым номером телефона
+  def self.valid_phone?(phone)
+    phone.match?(/\A\+?\d{1,14}\z/)
+  end
+
+  # Метод валидации всех полей, включая номер телефона и обязательность контакта
+  def validate
+    raise "Некорректный номер телефона" if phone && !Student.valid_phone?(phone)
+    raise "Должен быть хотя бы один контакт: телефон, Telegram, email" if [phone, telegram, email].all?(&:nil?)
+    raise "Git должен быть указан" if git.nil?
+  end
+
+  # Метод для установки контактов (телефон, Telegram, email)
+  def set_contacts(contacts = {})
+    self.phone = contacts[:phone] if contacts[:phone]
+    self.telegram = contacts[:telegram] if contacts[:telegram]
+    self.email = contacts[:email] if contacts[:email]
+    validate
   end
 
   private
 
   # Метод для установки необязательных атрибутов
   def set_optional_attributes(attributes = {})
-    self.phone = attributes[:phone] if attributes[:phone]             # Устанавливаем Телефон, если он есть
-    self.telegram = attributes[:telegram] if attributes[:telegram]     # Устанавливаем Telegram, если он есть
-    self.email = attributes[:email] if attributes[:email]               # Устанавливаем Email, если он есть
-    self.git = attributes[:git] if attributes[:git]                     # Устанавливаем Git, если он есть
+    self.phone = attributes[:phone]                                           # Устанавливаем Телефон, если он есть
+    self.telegram = attributes[:telegram]                                     # Устанавливаем Telegram, если он есть
+    self.email = attributes[:email]                                           # Устанавливаем Email, если он есть
+    self.git = attributes[:git]                                               # Устанавливаем Git, если он есть
   end
 
   # Возвращаем строковое представление объекта Student
   def to_s
-    "ID: #{id}, Фамилия: #{last_name}, Имя: #{first_name}, Отчество: #{middle_name}, Телефон: #{phone}, Telegram: #{telegram}, Email: #{email}, Git: #{git}"
+    "ID: #{id || 'не указан'}, Фамилия: #{last_name}, Имя: #{first_name}, Отчество: #{middle_name}, Телефон: #{phone || 'не указан'}, Telegram: #{telegram || 'не указан'}, Email: #{email || 'не указан'}, Git: #{git || 'не указан'}"
   end
 end
+
