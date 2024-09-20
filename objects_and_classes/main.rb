@@ -1,16 +1,20 @@
 require_relative 'student'
 
-# Создание объектов класса Student
-students = [
-  Student.new(1, 'Иванов', 'Иван', 'Иванович'),
-  Student.new(2, 'Петров', 'Пётр', 'Петрович', '8-800-123-45-67'),
-  Student.new(3, 'Сидоров', 'Сергей', 'Сидорович', '8-800-901-23-45', '@test1'),
-  Student.new(4, 'Кузнецов', 'Алексей', 'Кузнецович', '8-800-111-22-33', '@test2', 'test2@mail.com'),
-  Student.new(5, 'Попов', 'Дмитрий', 'Попович', '8-800-444-55-66', '@test3', 'test@mail.com', 'http://github.com/test3')
-]
+# Создание студентов с различными комбинациями полей
+student1 = Student.new(last_name: "Иванов", first_name: "Иван", middle_name: "Иванович", phone: "+79991234567", git: "github.com/ivanov")
+student2 = Student.new(last_name: "Петров", first_name: "Петр", middle_name: "Петрович", email: "petrov@mail.com", git: "github.com/petrov")
 
 # Вывод информации о студентах
-students.each do |student|
-  puts student.to_s
-  puts
+puts student1
+puts student2
+
+# Пример ошибки: Некорректный номер телефона
+begin
+  student3 = Student.new(last_name: "Сидоров", first_name: "Сидор", middle_name: "Сидорович", phone: "123", git: "github.com/sidorov")
+rescue => e
+  puts e.message
 end
+
+# Пример использования метода set_contacts
+student2.set_contacts(phone: "+79990001122", email: "new_petrov@mail.com")
+puts student2
