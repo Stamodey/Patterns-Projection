@@ -12,6 +12,24 @@ class Student
     self.email = email
     self.git = git
   end
+  
+  # Метод get_info, возвращает краткую информацию
+  def get_info
+    "#{last_name} #{first_name[0]}.#{middle_name[0]}; Git: #{git}; Связь: #{contact_info}"
+  end
+
+  # Метод для получения информации о связи
+  def contact_info
+    if phone
+      "Телефон: #{phone}"
+    elsif telegram
+      "Telegram: #{telegram}"
+    elsif email
+      "Email: #{email}"
+    else
+      "Нет контактной информации"
+    end
+  end
 
   # Конструктор, принимающий строку
   def self.from_string(str)
@@ -34,3 +52,14 @@ class Student
     raise "Error parsing string: #{e.message}"
   end
 end
+# Пример тестирования класса
+begin
+  student_str = '1, Snake, Solid, David, 1234567897, @solidsnake, solid.snake@game.com, solidsnake'
+  
+  # Создание объекта через строку
+  student = Student.from_string(student_str)
+  puts student.get_info
+rescue => e
+  puts "Ошибка: #{e.message}"
+end
+
