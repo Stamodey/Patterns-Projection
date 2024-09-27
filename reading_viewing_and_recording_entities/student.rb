@@ -129,28 +129,40 @@ rescue => e
   raise "Ошибка при чтении файла: #{e.message}"
 end
 
-# Пример тестирования
+# Метод для записи данных студентов в файл
+def self.write_to_txt(file_path, students)
+  File.open(file_path, 'w') do |file|
+    students.each do |student|
+      file.puts "#{student.id}, #{student.last_name}, #{student.first_name}, #{student.middle_name}, #{student.phone}, #{student.telegram}, #{student.email}, #{student.git}"
+    end
+  end
+end
+
+# Пример использования
 begin
-  # Пример создания объекта Student из строки
+  # 1. Пример создания объекта Student вручную
   student_str = '1, Snake, Solid, David, 1234567897, @solidsnake, solid.snake@game.com, solidsnake'
   student = Student.from_string(student_str)
-  puts student.get_info
+  puts "Создан объект: #{student.get_info}"
 
-  # Пример создания объекта Student_short из строки
-  short_student_str = 'Петров, Петр, Сидоров, git_petrov, Телефон: 1234567890'
-  student_short = Student_short.from_string(2, short_student_str)
-  puts student_short.get_info
-rescue => e
-  # Обработка ошибок
-  puts "Ошибка: #{e.message}"
-end
-
-# Пример использования метода read_from_txt
-begin
-  # Чтение студентов из файла
+  # 2. Чтение студентов из файла 'students.txt'
+  puts "\nЧтение данных из файла 'students.txt':"
   students_from_file = read_from_txt('students.txt')
   students_from_file.each { |student| puts student.get_info }
+
+  # 3. Добавляем нового студента в список
+  puts "\nДобавляем нового студента в список:"
+  new_student_str = '4, Fisher, Sam, Michael, 9876543210, @samfisher, sam.fisher@stealth.com, samfisher'
+  new_student = Student.from_string(new_student_str)
+  students_from_file << new_student
+  students_from_file.each { |student| puts student.get_info }
+
+  # 4. Запись обновленного списка студентов в файл 'output_students.txt'
+  puts "\nЗапись обновленного списка студентов в файл 'output_students.txt':"
+  write_to_txt('output_students.txt', students_from_file)
+
+  puts "Запись завершена успешно."
 rescue => e
-  # Обработка ошибок
   puts "Ошибка: #{e.message}"
 end
+
