@@ -4,12 +4,12 @@ class Person
   attr_reader :id, :last_name, :first_name, :middle_name, :git, :contact_info
 
   # Конструктор для инициализации объекта Person
-  def initialize(id, last_name, first_name, middle_name, git = nil, contact_info = nil)
+  def initialize(last_name, first_name, middle_name, id = nil, git = nil, contact_info = nil)
     # Проверка обязательных полей (Фамилия, Имя, Отчество)
     raise 'Фамилия не может быть пустой' if last_name.nil? || last_name.strip.empty?
     raise 'Имя не может быть пустым' if first_name.nil? || first_name.strip.empty?
     raise 'Отчество не может быть пустым' if middle_name.nil? || middle_name.strip.empty?
-    
+
     # Используем сеттеры для инициализации атрибутов
     self.id = id
     self.last_name = last_name
@@ -26,7 +26,7 @@ class Person
 
   # Метод для получения общей информации о человеке
   def get_info
-    "#{full_name}; Git: #{git}; Связь: #{contact_info}"
+    "#{full_name}; Git: #{git}; Связь: #{contact_info}; ID: #{id.nil? ? ' ' : id}"
   end
 
   # Делаем сеттеры защищенными, чтобы предотвратить изменение полей вне класса и его наследников
