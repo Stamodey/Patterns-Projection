@@ -1,3 +1,0 @@
-1, Snake, Solid, David, 1234567897, @solidsnake, solid.snake@game.com, solidsnake
-2, Dante, Toni, Redgrave, 88005553535, @dante, dante.toni@game.com, dante
-3, Ezio, Ayditore, Ferinse, +123456789, @ezio, ezio.ayditore@game.com, ezio
