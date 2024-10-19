@@ -1,4 +1,3 @@
-# student_short.rb
 require_relative 'person'
 
 class StudentShort < Person
@@ -22,7 +21,9 @@ class StudentShort < Person
     info.push("ID: #{@id}") if @id
     info.push("Initials: #{@initials}")
     info.push("GitHub: #{@git}") if @git
-    info.push("#{@contacts.join("; ")}") unless @contacts.empty?
+    if @contacts.any?
+      info.push("Contact: #{@contacts.first}")
+    end
     info.compact.join("; ")
   end
 
@@ -46,7 +47,7 @@ class StudentShort < Person
 
   # Метод для добавления контакта
   def add_contact(value, type)
-    @contacts ||= []  # Инициализация массива контактов
+    @contacts ||= [] # Инициализация массива контактов
     @contacts << "#{type}: #{value}" if value
   end
 end
