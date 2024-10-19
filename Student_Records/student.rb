@@ -7,7 +7,6 @@ class Student < Person
   def initialize(last_name:, first_name:, middle_name:, id: nil, git: nil, **contacts)
     super(last_name: last_name, first_name: first_name, middle_name: middle_name, id: id, git: git)
     set_contacts(contacts)
-    validate
   end
 
   # Метод для установки контактов
@@ -57,11 +56,6 @@ class Student < Person
     raise 'Некорректный email' unless email.nil? || email.match?(/\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i)
   end
 
-  # Валидация студента
-  def validate
-    raise 'Git не может быть пустым' if git.nil?
-    raise 'Необходим хотя бы один контакт' if contacts.empty?
-  end
 
   # Метод класса для создания объекта из строки
   def self.from_string(str)
