@@ -3,7 +3,7 @@ class Person
 
   # Конструктор объекта класса Person
   def initialize(last_name:, first_name:, middle_name:, id: nil, git: nil)
-    @id = id
+    self.id = id
     self.last_name = last_name  # Сеттер для фамилии
     self.first_name = first_name # Сеттер для имени
     self.middle_name = middle_name # Сеттер для отчества
@@ -29,6 +29,10 @@ class Person
   def git=(git)
     raise 'Неверный формат Git' unless git.nil? || self.class.valid_git?(git)
     @git = git
+  end
+  
+  def id=(id)
+    @id = id
   end
 
   # Методы класса для валидации
