@@ -1,57 +1,49 @@
-# Суперкласс Person для представления основной информации о человеке
 class Person
-  # Определяем атрибуты для чтения
-  attr_reader :id, :last_name, :first_name, :middle_name, :git, :contact_info
+  attr_reader :last_name, :first_name, :middle_name, :git, :id
 
-  # Конструктор для инициализации объекта Person
-  def initialize(last_name, first_name, middle_name, id = nil, git = nil, contact_info = nil)
-    # Проверка обязательных полей (Фамилия, Имя, Отчество)
-    raise 'Фамилия не может быть пустой' if last_name.nil? || last_name.strip.empty?
-    raise 'Имя не может быть пустым' if first_name.nil? || first_name.strip.empty?
-    raise 'Отчество не может быть пустым' if middle_name.nil? || middle_name.strip.empty?
-
-    # Используем сеттеры для инициализации атрибутов
-    self.id = id
-    self.last_name = last_name
-    self.first_name = first_name
-    self.middle_name = middle_name
-    self.git = git
-    self.contact_info = contact_info
+  # Конструктор объекта класса Person
+  def initialize(last_name:, first_name:, middle_name:, id: nil, git: nil)
+    @id = id
+    self.last_name = last_name  # Сеттер для фамилии
+    self.first_name = first_name # Сеттер для имени
+    self.middle_name = middle_name # Сеттер для отчества
+    self.git = git               # Сеттер для Git
   end
 
-  # Метод для получения полного имени (Фамилия И.О.)
-  def full_name
-    "#{last_name} #{first_name[0]}.#{middle_name[0]}."
-  end
-
-  # Метод для получения общей информации о человеке
-  def get_info
-    "#{full_name}; Git: #{git}; Связь: #{contact_info}; ID: #{id.nil? ? ' ' : id}"
-  end
-
-  # Делаем сеттеры защищенными, чтобы предотвратить изменение полей вне класса и его наследников
-  protected
-
-  attr_writer :id, :git, :contact_info
-
-  # Добавляем валидацию на ввод только букв
+  # Сеттеры для атрибутов
   def last_name=(last_name)
-    raise 'Фамилия должна содержать только буквы' unless valid_name?(last_name)
+    validate_name!(last_name, 'Фамилия должна содержать только буквы')
     @last_name = last_name
   end
 
   def first_name=(first_name)
-    raise 'Имя должно содержать только буквы' unless valid_name?(first_name)
+    validate_name!(first_name, 'Имя должно содержать только буквы')
     @first_name = first_name
   end
 
   def middle_name=(middle_name)
-    raise 'Отчество должно содержать только буквы' unless valid_name?(middle_name)
+    validate_name!(middle_name, 'Отчество должно содержать только буквы')
     @middle_name = middle_name
   end
 
-  # Метод для проверки валидности ФИО (разрешены только буквы)
-  def valid_name?(name)
-    /^[а-яА-Яa-zA-Z]+$/.match?(name)
+  def git=(git)
+    raise 'Неверный формат Git' unless git.nil? || self.class.valid_git?(git)
+    @git = git
+  end
+
+  # Методы класса для валидации
+  def self.valid_git?(git)
+    git.match?(/\Ahttps:\/\/github\.com\/[a-zA-Z0-9._-]+\z/)
+  end
+
+  def self.valid_name?(name)
+    name.match?(/\A[а-яА-Яa-zA-Z]+\z/)
+  end
+
+  private
+
+  # Приватный метод для валидации имени
+  def validate_name!(name, error_message)
+    raise error_message unless self.class.valid_name?(name)
   end
 end
