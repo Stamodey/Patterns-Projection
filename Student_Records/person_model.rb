@@ -1,4 +1,5 @@
 class Person
+  
   attr_reader :last_name, :first_name, :middle_name, :git, :id
 
   # Конструктор объекта класса Person
