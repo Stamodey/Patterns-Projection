@@ -5,6 +5,7 @@ require_relative 'student_short'
 
 
 begin
+  
   student_str = '1, Иванов, Иван, Иванович, +79001234567, , ivanov@example.com, https://github.com/ivanov'  
   student = Student.from_string(student_str)
   puts "Создан объект:\n#{student.get_info}"
