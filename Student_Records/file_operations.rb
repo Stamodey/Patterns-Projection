@@ -21,4 +21,5 @@ def write_to_txt(file_path, students)
       file.puts "#{student.id}, #{student.last_name}, #{student.first_name}, #{student.middle_name}, #{contact_info}, #{student.git}"
     end
   end
+  
 end
