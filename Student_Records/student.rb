@@ -1,7 +1,6 @@
 require_relative 'person'
 
 class Student < Person
-  
   attr_reader :contacts
 
   # Конструктор объекта класса Student
@@ -21,42 +20,9 @@ class Student < Person
         self.email = value unless value.nil? || value.empty?
       when :telegram
         self.telegram = value unless value.nil? || value.empty?
-      else
-        raise 'Некорректный тип контакта'
       end
     end
   end
-
-  # Сеттеры для контактов
-  def phone=(phone)
-    self.class.validate_phone(phone)
-    @contacts[:phone] = phone if phone
-  end
-
-  def email=(email)
-    self.class.validate_email(email)
-    @contacts[:email] = email if email
-  end
-
-  def telegram=(telegram)
-    return if telegram.nil? || telegram.empty?
-    self.class.validate_telegram(telegram)
-    @contacts[:telegram] = telegram if telegram
-  end
-
-  # Методы класса для валидации контактов
-  def self.validate_phone(phone)
-    raise 'Некорректный номер телефона' unless phone.nil? || phone.match?(/\A(\+7|8)?\d{10,12}\z/)
-  end
-
-  def self.validate_telegram(telegram)
-    raise 'Некорректный Telegram' unless telegram.nil? || telegram.match?(/\A@\w+\z/)
-  end
-
-  def self.validate_email(email)
-    raise 'Некорректный email' unless email.nil? || email.match?(/\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i)
-  end
-
 
   # Метод класса для создания объекта из строки
   def self.from_string(str)
@@ -68,9 +34,9 @@ class Student < Person
     first_name = data[2]
     middle_name = data[3]
     contacts = {}
-    contacts[:phone] = data[4] if data.size > 4
-    contacts[:telegram] = data[5] if data.size > 5
-    contacts[:email] = data[6] if data.size > 6
+    contacts[:phone] = data[4] if data.size > 4 && validate_phone(data[4])
+    contacts[:telegram] = data[5] if data.size > 5 && validate_telegram(data[5])
+    contacts[:email] = data[6] if data.size > 6 && validate_email(data[6])
     git = data[7] if data.size > 7
 
     new(last_name: last_name, first_name: first_name, middle_name: middle_name, id: id, git: git, **contacts)
@@ -78,9 +44,37 @@ class Student < Person
 
   # Метод для получения информации о студенте
   def get_info
-    initials = "#{last_name} #{first_name[0]}. #{middle_name[0]}."
-    contact_info = contacts.map { |type, value| "#{type.capitalize}: #{value}" }.join("; ")
+    initials = "#{@last_name} #{@first_name[0]}. #{@middle_name[0]}."
+    contact_info = @contacts.map { |type, value| "#{type.capitalize}: #{value}" }.join("; ")
     contact_info_output = contact_info.empty? ? "Нет контактной информации" : contact_info
-    "Фамилия: #{last_name}; Инициалы: #{initials}; Git: #{git}; #{contact_info_output}"
+    "Фамилия: #{@last_name}; Инициалы: #{initials}; Git: #{@git}; #{contact_info_output}"
+  end
+
+  protected
+
+  # Сеттеры для контактов
+  def phone=(phone)
+    @contacts[:phone] = phone if self.class.validate_phone(phone)
+  end
+
+  def email=(email)
+    @contacts[:email] = email if self.class.validate_email(email)
+  end
+
+  def telegram=(telegram)
+    @contacts[:telegram] = telegram if self.class.validate_telegram(telegram)
+  end
+
+  # Методы класса для валидации контактов
+  def self.validate_phone(phone)
+    phone.match?(/\A(\+7|8)?\d{10,12}\z/)
+  end
+
+  def self.validate_telegram(telegram)
+    telegram.match?(/\A@\w+\z/)
+  end
+
+  def self.validate_email(email)
+    email.match?(/\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i)
   end
 end
