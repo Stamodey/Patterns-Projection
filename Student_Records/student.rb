@@ -1,80 +1,71 @@
+
 require_relative 'person'
 
-class Student < Person
-  attr_reader :contacts
+class StudentShort < Person
+  attr_reader :initials, :contacts
 
-  # Конструктор объекта класса Student
-  def initialize(last_name:, first_name:, middle_name:, id: nil, git: nil, **contacts)
-    super(last_name: last_name, first_name: first_name, middle_name: middle_name, id: id, git: git)
-    set_contacts(contacts)
+  # Конструктор объекта класса StudentShort, принимает объект Student
+  # Проверка, что аргумент является объектом класса Student
+  def initialize(student)
+    raise ArgumentError, 'Argument must be a Student' unless student.is_a?(Student)
+    
+    initialize_attributes
+    initialize_from_student(student)
   end
 
-  # Метод для установки контактов
-  def set_contacts(contacts)
-    @contacts = {}
-    contacts.each do |type, value|
-      case type
-      when :phone
-        self.phone = value unless value.nil? || value.empty?
-      when :email
-        self.email = value unless value.nil? || value.empty?
-      when :telegram
-        self.telegram = value unless value.nil? || value.empty?
-      end
-    end
+  # Метод для создания объекта StudentShort из строки
+  # Разбирает строку и создает объект StudentShort с использованием данных
+  def self.from_string(string)
+    data = string.split(', ')
+    
+    # Создаем объект StudentShort, передавая необходимые параметры
+    student_short = new(Student.new(
+      last_name: data[1], 
+      first_name: data[2], 
+      middle_name: data[3], 
+      id: data[0].to_i, 
+      git: data[4]
+    ))
+
+    # Если контакт есть, добавляем его в объект
+    student_short.add_contact(data[5], 'Contact') if data.size > 5
+    student_short
   end
 
-  # Метод класса для создания объекта из строки
-  def self.from_string(str)
-    data = str.split(', ')
-    raise 'Invalid format' if data.size < 4 || data.size > 8
-
-    id = data[0].empty? ? nil : data[0].to_i
-    last_name = data[1]
-    first_name = data[2]
-    middle_name = data[3]
-    contacts = {}
-    contacts[:phone] = data[4] if data.size > 4 && validate_phone(data[4])
-    contacts[:telegram] = data[5] if data.size > 5 && validate_telegram(data[5])
-    contacts[:email] = data[6] if data.size > 6 && validate_email(data[6])
-    git = data[7] if data.size > 7
-
-    new(last_name: last_name, first_name: first_name, middle_name: middle_name, id: id, git: git, **contacts)
+  # Метод для отображения информации о StudentShort
+  # Формирует строку с информацией об объекте
+  def to_s
+    info = []
+    info << "ID: #{@id}" if @id
+    info << "Initials: #{@initials}"
+    info << "GitHub: #{@git}" if @git
+    info << "Contact: #{@contacts.first}" if @contacts.any?
+    info.compact.join("; ")
   end
 
-  # Метод для получения информации о студенте
-  def get_info
-    initials = "#{@last_name} #{@first_name[0]}. #{@middle_name[0]}."
-    contact_info = @contacts.map { |type, value| "#{type.capitalize}: #{value}" }.join("; ")
-    contact_info_output = contact_info.empty? ? "Нет контактной информации" : contact_info
-    "Фамилия: #{@last_name}; Инициалы: #{initials}; Git: #{@git}; #{contact_info_output}"
+  private
+
+  # Приватный метод для инициализации атрибутов объекта
+  # Устанавливает начальные значения атрибутов
+  def initialize_attributes
+    @id = nil
+    @initials = ''
+    @git = nil
+    @contacts = []
   end
 
-  protected
-
-  # Сеттеры для контактов
-  def phone=(phone)
-    @contacts[:phone] = phone if self.class.validate_phone(phone)
+  # Приватный метод для инициализации объекта на основе данных из Student
+  def initialize_from_student(student)
+    @id = student.id
+    @initials = "#{student.last_name} #{student.first_name[0]}. #{student.middle_name[0]}."
+    @git = student.git
+    # Добавляем все контакты из объекта Student
+    student.contacts.each { |type, value| add_contact(value, type.capitalize) }
   end
 
-  def email=(email)
-    @contacts[:email] = email if self.class.validate_email(email)
-  end
-
-  def telegram=(telegram)
-    @contacts[:telegram] = telegram if self.class.validate_telegram(telegram)
-  end
-
-  # Методы класса для валидации контактов
-  def self.validate_phone(phone)
-    phone.match?(/\A(\+7|8)?\d{10,12}\z/)
-  end
-
-  def self.validate_telegram(telegram)
-    telegram.match?(/\A@\w+\z/)
-  end
-
-  def self.validate_email(email)
-    email.match?(/\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i)
+  # Метод для добавления контакта в список контактов
+  # Если контакт существует, добавляем его
+  def add_contact(value, type)
+    @contacts << "#{type}: #{value}" if value
   end
 end
