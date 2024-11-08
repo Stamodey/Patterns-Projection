@@ -1,9 +1,7 @@
-require_relative 'person'
-
 class StudentShort < Person
   attr_reader :initials, :contacts
 
-  # Конструктор объекта класса StudentShort, принимает только объект Student
+  # Конструктор объекта класса StudentShort, принимает объект Student
   def initialize(student)
     raise ArgumentError, 'Argument must be a Student' unless student.is_a?(Student)
     
@@ -11,22 +9,7 @@ class StudentShort < Person
     initialize_from_student(student)
   end
 
-  # Метод для создания объекта StudentShort из строки
-  def self.from_string(string)
-    data = string.split(', ')
-    student_short = new(Student.new(
-      last_name: data[1], 
-      first_name: data[2], 
-      middle_name: data[3], 
-      id: data[0].to_i, 
-      git: data[4]
-    ))
-
-    student_short.add_contact(data[5], 'Contact') if data.size > 5
-    student_short
-  end
-
-  # Метод для отображения информации
+  # Метод для отображения информации о StudentShort
   def to_s
     info = []
     info << "ID: #{@id}" if @id
@@ -38,7 +21,7 @@ class StudentShort < Person
 
   private
 
-  # Приватный метод для инициализации атрибутов
+  # Приватный метод для инициализации атрибутов объекта
   def initialize_attributes
     @id = nil
     @initials = ''
@@ -46,15 +29,16 @@ class StudentShort < Person
     @contacts = []
   end
 
-  # Приватные методы инициализации
+  # Приватный метод для инициализации объекта на основе данных из Student
   def initialize_from_student(student)
     @id = student.id
     @initials = "#{student.last_name} #{student.first_name[0]}. #{student.middle_name[0]}."
     @git = student.git
+    # Добавляем все контакты из объекта Student
     student.contacts.each { |type, value| add_contact(value, type.capitalize) }
   end
 
-  # Метод для добавления контакта
+  # Метод для добавления контакта в список контактов
   def add_contact(value, type)
     @contacts << "#{type}: #{value}" if value
   end
