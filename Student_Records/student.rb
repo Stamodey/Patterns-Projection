@@ -1,10 +1,11 @@
-require_relative 'person'
+require_relative 'person_model'
 
 class Student < Person
   # Чтение контактов
   attr_reader :contacts
 
   # Конструктор объекта класса Student
+  # Принимает параметры: фамилия, имя, отчество, id, git ( и контакты
   def initialize(last_name:, first_name:, middle_name:, id: nil, git: nil, **contacts)
     super(last_name: last_name, first_name: first_name, middle_name: middle_name, id: id, git: git)
     set_contacts(contacts)
