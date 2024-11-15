@@ -5,8 +5,14 @@ class StudentShort < Person
   def initialize(student)
     raise ArgumentError, 'Argument must be a Student' unless student.is_a?(Student)
     
-    initialize_attributes
-    initialize_from_student(student)
+    # Инициализация только необходимых полей
+    @id = student.id
+    @initials = "#{student.last_name} #{student.first_name[0]}. #{student.middle_name[0]}."
+    @git = student.git
+    @contacts = []
+
+    # Добавляем все контакты из объекта Student
+    student.contacts.each { |type, value| add_contact(value, type.capitalize) }
   end
 
   # Метод для отображения информации о StudentShort
@@ -21,24 +27,7 @@ class StudentShort < Person
 
   private
 
-  # Приватный метод для инициализации атрибутов объекта
-  def initialize_attributes
-    @id = nil
-    @initials = ''
-    @git = nil
-    @contacts = []
-  end
-
-  # Приватный метод для инициализации объекта на основе данных из Student
-  def initialize_from_student(student)
-    @id = student.id
-    @initials = "#{student.last_name} #{student.first_name[0]}. #{student.middle_name[0]}."
-    @git = student.git
-    # Добавляем все контакты из объекта Student
-    student.contacts.each { |type, value| add_contact(value, type.capitalize) }
-  end
-
-  # Метод для добавления контакта в список контактов
+  # Приватный метод для добавления контакта в список контактов
   def add_contact(value, type)
     @contacts << "#{type}: #{value}" if value
   end
