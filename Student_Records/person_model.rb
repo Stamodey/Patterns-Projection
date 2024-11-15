@@ -9,7 +9,7 @@ class Person
     self.git = git
   end
 
-  protected
+  private
 
   def last_name=(last_name)
     if self.class.valid_name?(last_name)
@@ -46,6 +46,9 @@ class Person
   def id=(id)
     @id = id
   end
+
+  # Сделаем проверки доступными для классов-наследников
+  protected
 
   def self.valid_git?(git)
     git.match?(/\Ahttps:\/\/github\.com\/[a-zA-Z0-9._-]+\z/)
