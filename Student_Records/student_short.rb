@@ -1,34 +1,54 @@
 class StudentShort < Person
-  attr_reader :initials, :contacts
+  attr_reader :id, :initials, :git, :contact
 
-  # Конструктор объекта класса StudentShort, принимает объект Student
-  def initialize(student)
-    raise ArgumentError, 'Argument must be a Student' unless student.is_a?(Student)
-    
-    # Инициализация только необходимых полей
-    @id = student.id
-    @initials = "#{student.last_name} #{student.first_name[0]}. #{student.middle_name[0]}."
-    @git = student.git
-    @contacts = []
-
-    # Добавляем все контакты из объекта Student
-    student.contacts.each { |type, value| add_contact(value, type.capitalize) }
+  def self.create_from_student(student)
+    raise ArgumentError, nil unless student.is_a?(Student)
+    new(student: student)
   end
 
-  # Метод для отображения информации о StudentShort
+  def self.create_from_string(info_str)
+    new(info_str: info_str)
+  end
+
   def to_s
-    info = []
-    info << "ID: #{@id}" if @id
-    info << "Initials: #{@initials}"
-    info << "GitHub: #{@git}" if @git
-    info << "Contact: #{@contacts.first}" if @contacts.any?
-    info.compact.join("; ")
+    "ID: #{@id}; Initials: #{@initials}; GitHub: #{normalize_value(@git)}; Contact: #{@contact || 'нет'}"
   end
 
-  private
+  private_class_method :new
 
-  # Приватный метод для добавления контакта в список контактов
-  def add_contact(value, type)
-    @contacts << "#{type}: #{value}" if value
+  def initialize(student: nil, info_str: nil)
+    data = student ? prepare_student_data(student) : prepare_string_data(info_str)
+    initialize_attributes(*data)
+  end
+
+  def prepare_student_data(student)
+    [student.id, generate_initials(student.last_name, student.first_name, student.middle_name), student.git, select_contact(student.contacts)]
+  end
+
+  def prepare_string_data(info_str)
+    parts = parse_info_string(info_str)
+    [parts[0], generate_initials(parts[1], parts[2], parts[3]), parts[7], select_contact(phone: parts[4], telegram: parts[5], email: parts[6])]
+  end
+
+  def initialize_attributes(id, initials, git, contact)
+    @id, @initials, @git, @contact = id, initials, git, contact
+  end
+
+  def generate_initials(last_name, first_name, middle_name)
+    "#{last_name} #{first_name[0]}." + (middle_name.to_s[0] ? " #{middle_name[0]}." : "")
+  end
+
+  def select_contact(contacts)
+    contacts.values.find { |v| v && !v.empty? } || nil
+  end
+
+  def normalize_value(value)
+    value.nil? || value.empty? ? nil : value
+  end
+
+  def parse_info_string(info_str)
+    parts = info_str.split(', ').map(&:strip)
+    raise ArgumentError, 'Invalid info format' if parts.size < 7
+    parts
   end
 end
