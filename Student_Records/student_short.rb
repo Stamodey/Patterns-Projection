@@ -1,5 +1,5 @@
 class StudentShort < Person
-  attr_reader :id, :initials, :git, :contact
+  attr_reader :initials, :contact
 
   def self.create_from_student(student)
     raise ArgumentError, nil unless student.is_a?(Student)
