@@ -3,11 +3,13 @@ class StudentShort < Person
 
   def self.create_from_student(student)
     raise ArgumentError, nil unless student.is_a?(Student)
-    new(student: student)
+    data = self.prepare_student_data(student)
+    new(*data)
   end
 
   def self.create_from_string(info_str)
-    new(info_str: info_str)
+    data = self.prepare_string_data(info_str)
+    new(*data)
   end
 
   def to_s
@@ -16,29 +18,24 @@ class StudentShort < Person
 
   private_class_method :new
 
-  def initialize(student: nil, info_str: nil)
-    data = student ? prepare_student_data(student) : prepare_string_data(info_str)
-    initialize_attributes(*data)
+  def self.prepare_student_data(student)
+    [student.id, self.generate_initials(student.last_name, student.first_name, student.middle_name), student.git, self.select_contact(student.contacts)]
   end
 
-  def prepare_student_data(student)
-    [student.id, generate_initials(student.last_name, student.first_name, student.middle_name), student.git, select_contact(student.contacts)]
+  def self.prepare_string_data(info_str)
+    parts = self.parse_info_string(info_str)
+    [parts[0], self.generate_initials(parts[1], parts[2], parts[3]), parts[7], self.select_contact(phone: parts[4], telegram: parts[5], email: parts[6])]
   end
 
-  def prepare_string_data(info_str)
-    parts = parse_info_string(info_str)
-    [parts[0], generate_initials(parts[1], parts[2], parts[3]), parts[7], select_contact(phone: parts[4], telegram: parts[5], email: parts[6])]
-  end
-
-  def initialize_attributes(id, initials, git, contact)
+  def initialize(id, initials, git, contact)
     @id, @initials, @git, @contact = id, initials, git, contact
   end
 
-  def generate_initials(last_name, first_name, middle_name)
+  def self.generate_initials(last_name, first_name, middle_name)
     "#{last_name} #{first_name[0]}." + (middle_name.to_s[0] ? " #{middle_name[0]}." : "")
   end
 
-  def select_contact(contacts)
+  def self.select_contact(contacts)
     contacts.values.find { |v| v && !v.empty? } || nil
   end
 
@@ -46,7 +43,7 @@ class StudentShort < Person
     value.nil? || value.empty? ? nil : value
   end
 
-  def parse_info_string(info_str)
+  def self.parse_info_string(info_str)
     parts = info_str.split(', ').map(&:strip)
     raise ArgumentError, 'Invalid info format' if parts.size < 7
     parts
