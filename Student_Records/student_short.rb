@@ -48,4 +48,5 @@ class StudentShort < Person
     raise ArgumentError, 'Invalid info format' if parts.size < 7
     parts
   end
+  
 end
