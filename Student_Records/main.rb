@@ -2,14 +2,19 @@ require_relative 'person'
 require_relative 'student'
 require_relative 'student_short'
 
-def write_students_to_file(file_path, file_name, students)
-  raise ArgumentError, "Invalid file path: #{file_path}" unless File.exist?(File.dirname(file_path))
+def write_students_to_file(file_name, students)
+  raise ArgumentError, "Invalid file name: #{file_name}" unless file_name
 
-  Dir.mkdir(File.dirname(file_path)) unless Dir.exist?(File.dirname(file_path))
-  File.open("#{file_path}/#{file_name}.txt", 'w') do |file|
+  students.each do |student|
+    raise ArgumentError, "Student is nil" unless student
+  end
+
+  File.open("#{file_name}.txt", 'w') do |file|
     students.each do |student|
       file.puts student.to_s
     end
+  rescue IOError => e
+    puts "IOError: #{e.message}"
   end
 end
 
@@ -59,13 +64,16 @@ puts "--- СтудентShort из строки ---"
 puts student_short_from_string.to_s
 puts "Есть ли контакт: #{student_short_from_string.contact_available? ? 'Да' : 'Нет'}"
 
+
+
+
 # Создаем несколько студентов
 students = [
   Student.from_string('ID: 1, Фамилия: Иванов, Имя: Иван, Отчество: Иванович, Телефон: +79162345678, Телеграм: @ivanov, Почта: ivanov@gmail.com, Гит: https://github.com/ivanov/portfolio'),
   Student.from_string('ID: 2, Фамилия: Петров, Имя: Петя, Отчество: Петрович, Телефон: +98765432101, Телеграм: @petrov, Почта: petrov@gmail.com, Гит: https://github.com/ivanov/portfolio'),
 ]
 
-write_students_to_file('', 'data', students)
+write_students_to_file('data', students)
 
 # Чтение студентов из файла и вывод информации о них
 read_from_file('data.txt').each do |student|
