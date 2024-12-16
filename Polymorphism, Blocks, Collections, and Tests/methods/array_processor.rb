@@ -1,68 +1,71 @@
-# Реализация класса ArrayProcessor
 class ArrayProcessor
   def initialize(array)
-    @array = array.dup.freeze
+    @array = array.dup.freeze # Дублируем и замораживаем массив для защиты от изменений
   end
+
+  protected
 
   # Метод для получения элементов массива
   def elements
     @array
   end
 
-  # Реализация метода `all?`
-  def all?
-    return false unless block_given?
-    @array.each { |element| return false unless yield(element) }
-    true
-  end
+  public
 
-  # Реализация метода `find`
-  def find
-    return nil unless block_given?
-    @array.each { |element| return element if yield(element) }
+  # Метод для поиска первого элемента, соответствующего условию
+  def find(&block)
+    @array.each do |element|
+      return element if block.call(element)
+    end
     nil
   end
 
-  # Реализация метода `flat_map`
-  def flat_map
-    return [] unless block_given?
-    result = []
-    @array.each { |element| result.concat(yield(element)) }
-    result
-  end
+  # Метод для нахождения минимального элемента по условию
+  def min_by(&block)
+    return nil if @array.empty?
 
-  # Реализация метода `min_by`
-  def min_by
-    return nil unless block_given?
-    min_element = @array.first
-    min_value = yield(min_element)
+    min_element = @array[0]
     @array.each do |element|
-      current_value = yield(element)
-      if current_value < min_value
-        min_element = element
-        min_value = current_value
-      end
+      min_element = element if block.call(element) < block.call(min_element)
     end
     min_element
   end
 
-  # Реализация метода `one?`
-  def one?
-    return false unless block_given?
+  # Метод для агрегации значений
+  def inject(initial = nil, &block)
+    accumulator = initial || @array[0]
+    start_index = initial.nil? ? 1 : 0
+
+    @array[start_index..-1].each do |element|
+      accumulator = block.call(accumulator, element)
+    end
+    accumulator
+  end
+
+  # Метод для проверки, есть ли ровно один элемент, соответствующий условию
+  def one?(&block)
     count = 0
     @array.each do |element|
-      count += 1 if yield(element)
+      count += 1 if block.call(element)
       return false if count > 1
     end
     count == 1
   end
 
-  # Реализация метода `inject`
-  def inject(initial = nil)
-    accumulator = initial
+  # Метод для "плоской" агрегации массивов
+  def flat_map(&block)
+    result = []
     @array.each do |element|
-      accumulator = accumulator.nil? ? element : yield(accumulator, element)
+      result.concat(block.call(element))
     end
-    accumulator
+    result
+  end
+
+  # Метод для проверки, все ли элементы соответствуют условию
+  def all?(&block)
+    @array.each do |element|
+      return false unless block.call(element)
+    end
+    true
   end
 end
