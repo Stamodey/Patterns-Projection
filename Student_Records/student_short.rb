@@ -2,61 +2,50 @@ class StudentShort < Person
   attr_reader :initials, :contact
 
   def self.create_from_student(student)
-    raise ArgumentError, 'Input must be a Student object' unless student.is_a?(Student)
-    data = prepare_student_data(student)
-    new(*data)
+    new(
+      student_id: student.student_id,
+      git: student.git,
+      initials: "#{student.last_name} #{student.first_name[0]}.#{student.middle_name ? " #{student.middle_name[0]}." : ''}",
+      contact: student.contact_info
+    )
   end
 
-  def self.create_from_string(info_str)
-    data = prepare_string_data(info_str)
-    new(*data)
+  def self.create_from_string(string)
+    attributes = {}
+
+    string.split(', ').each do |pair|
+      key, value = pair.split(': ')
+      attributes[key] = value
+    end
+
+    new(
+      student_id: attributes['student_id'],
+      git: attributes['git'],
+      initials: attributes['surname_initials'],
+      contact: attributes['contact']
+    )
   end
 
   def to_s
-    "ID: #{@id}; Initials: #{@initials}; GitHub: #{normalize_value(@git)}; Contact: #{@contact || 'нет'}"
+    "ID: #{@student_id}, ФИО: #{@initials} Git: #{@git.nil? ? 'нет' : @git} Контакт: #{@contact.nil? ? 'нет' : @contact}"
   end
 
-
-  def normalize_value(value)
-    value.nil? || value.empty? ? 'нет' : value
+  def contact_available?
+    !@contact.nil?
   end
 
-  def self.prepare_student_data(student)
-    [
-      student.id,
-      student.initials,  # Используем метод initials из Person
-      student.git,
-      student.contact  # Используем метод contact из Student (и, соответственно, из Person)
-    ]
-  end
-
-  # Подготовка данных из строки
-  def self.prepare_string_data(info_str)
-    parts = parse_info_string(info_str)
-    contacts = { phone: parts[4], telegram: parts[5], email: parts[6] }
-    [
-      parts[0],
-      parts[1],  # Инициалами теперь будет занимать Person (student.initials)
-      parts[7],
-      select_contact(contacts)
-    ]
-  end
-
-  # Парсинг строки
-  def self.parse_info_string(info_str)
-    parts = info_str.split(', ').map(&:strip)
-    raise ArgumentError, 'Invalid info format' if parts.size < 7
-    parts
-  end
-
-  # Выбор контакта (первый ненулевой)
-  def self.select_contact(contacts)
-    contacts.values.find { |v| v && !v.empty? } || nil
+  def initials=(value)
+    unless value.match?(/\A[А-ЯЁ][а-яё]+\s[А-ЯЁ]\.\s[А-ЯЁ]\.\z/) || value.match?(/\A[А-ЯЁ][а-яё]+\s[А-ЯЁ]\.\z/)
+      raise ArgumentError, "Неправильно введено ФИО"
+    end
+    @initials = value
   end
 
   private_class_method :new
 
-  def initialize(id, initials, git, contact)
-    @id, @initials, @git, @contact = id, initials, git, contact
+  def initialize(student_id:, git:, initials:, contact: nil)
+    super(student_id: student_id, git: git)
+    self.initials = initials
+    @contact = contact
   end
 end
