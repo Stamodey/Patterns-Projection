@@ -1,4 +1,4 @@
-require_relative 'array_processor'
+require_relative 'task_2'
 
 # Unit tests
 class TestArrayProcessor
@@ -74,4 +74,5 @@ class TestArrayProcessor
   end
 end
 
+# Run the tests
 TestArrayProcessor.new.run
