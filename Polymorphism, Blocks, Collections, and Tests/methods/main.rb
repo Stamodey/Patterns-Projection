@@ -32,4 +32,5 @@ class TestArrayProcessor < Test::Unit::TestCase
     assert_true(@processor.all? { |x| x < 6 })
     assert_false(@processor.all? { |x| x < 5 })
   end
+  
 end
