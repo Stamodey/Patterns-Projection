@@ -1,24 +1,22 @@
-require_relative 'file_parser'
 require_relative 'html_tree'
 
-if __FILE__ == $0
-  puts "Enter the path to the file (HTML):"
-  file_path = gets.chomp
-  begin
-    structure = FileParser.parse(file_path)
-    raise "File structure is empty" if structure.nil? || structure.empty?
+html_tree = HtmlTree.new('D:/Ruby/html/example.html')
 
-    root = HTMLTree.build_from_structure(structure.first)  # Начинаем с первого элемента структуры
-    tree = HTMLTree.new(root)
-    
-    puts "Depth-first traversal:"
-    tree.each { |tag| puts tag }
+# Перебор элементов в глубину
+puts "Traversal in Depth First:"
+html_tree.each do |tag|
+  puts tag
+end
 
-    puts "---"
-    
-    puts "Breadth-first traversal:"
-    tree.each_breadth_first { |tag| puts tag }
-  rescue => e
-    puts "Error: #{e.message}"
-  end
+# Перебор элементов в ширину
+puts "\nTraversal in Breadth First:"
+html_tree.each_breadth_first do |tag|
+  puts tag
+end
+
+# Пример использования метода select
+puts "\nSelecting tags with name 'div':"
+selected_tags = html_tree.select { |tag| tag.name == 'div' }
+selected_tags.each do |tag|
+  puts tag
 end
