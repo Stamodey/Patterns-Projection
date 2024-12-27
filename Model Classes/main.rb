@@ -103,7 +103,7 @@ data_list = Data_list_student_short.new([student1_short, student2_short])
 
 # Вывод информации о столбцах
 puts "--- Столбцы Data_list_student_short ---"
-puts data_list.get_names.inspect
+puts data_list.specific_names.inspect
 
 # Получаем таблицу данных и выводим информацию
 table = data_list.get_data
