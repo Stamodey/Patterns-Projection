@@ -1,25 +1,33 @@
 class DataTable
-
-  attr_accessor :data
-
   def initialize(data)
-    # Инициализация данных через конструктор
-    self.data = data
+    unless data.is_a?(Array) && data.all? { |row| row.is_a?(Array) }
+      raise ArgumentError, 'Data must be a two-dimensional array'
+    end
+
+    self.data = data.freeze
   end
 
-
-  # Получить элемент по номеру строки и столбца
   def get_element(row, col)
-    data[row][col]
-  end
-
-  # Получить количество столбцов
-  def num_columns
-    data.first.length
+    validate_indices(row, col)
+    self.data[row][col]
   end
 
   # Получить количество строк
-  def num_rows
-    data.length
+  def rows_count
+    self.data.size
+  end
+
+  def columns_count
+    self.data.first.size
+  end
+
+  private
+
+  attr_accessor :data
+
+  def validate_indices(row, col)
+    if row < 0 || row >= rows_count || col < 0 || col >= columns_count
+      raise IndexError, 'Index out of bounds'
+    end
   end
 end
