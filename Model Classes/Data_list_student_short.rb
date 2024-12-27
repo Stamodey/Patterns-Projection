@@ -7,15 +7,6 @@ class Data_list_student_short < Data_list
     super(data)
   end
 
-  def get_names
-    return ["id", "initials", "git", "contact"]
-  end
-
-  def attributes(student_short)
-    # Теперь возвращаем только необходимые данные для 4 столбцов
-    return [student_short.student_id, student_short.initials, student_short.git, student_short.contact]
-  end
-
   def get_data
     table = []
     @array.each_with_index do |student_short, index|
@@ -23,4 +14,15 @@ class Data_list_student_short < Data_list
     end
     DataTable.new(table)
   end
+
+
+  private
+  def get_names
+    return ["id", "initials", "git", "contact"]
+  end
+
+  def attributes(student_short)
+    return [student_short.student_id, student_short.initials, student_short.git, student_short.contact]
+  end
+
 end
