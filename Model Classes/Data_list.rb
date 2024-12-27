@@ -26,6 +26,10 @@ class Data_list
     selected_array_id
   end
 
+  def specific_names
+    get_names
+  end
+
   def get_names
     raise NotImplementedError, "Метод get_names не реализован"
   end
