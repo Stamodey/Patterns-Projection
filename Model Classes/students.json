@@ -1,0 +1,23 @@
+[
+    {
+        "student_id": "1",
+        "first_name": "Иван",
+        "last_name": "Иванов",
+        "middle_name": "Иванович",
+        "phone": "+7 (123) 456-7890",
+        "email": "ivanov@example.com",
+        "telegram": "@ivanov",
+        "git": "https://github.com/ivanov/portfolio"
+    },
+    {
+        "student_id": "2",
+        "first_name": "Петр",
+        "last_name": "Петров",
+        "middle_name": "Петрович",
+        "phone": "+7 (987) 654-3210",
+        "email": "petrov@example.com",
+        "telegram": "@petrov",
+        "git": "https://github.com/petrov/portfolio"
+    }
+]
+
