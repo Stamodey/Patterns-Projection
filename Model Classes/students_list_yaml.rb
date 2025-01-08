@@ -1,15 +1,18 @@
-require 'yaml'
+require_relative 'student'
 require_relative 'students_list'
+require_relative 'student_short'
+require 'yaml'
 
-class StudentsListYAML < StudentsList
-  private
+class Student_list_YAML < Data_storage_strategy
 
-  def parse_data(raw_data)
-    yaml_data = YAML.safe_load(raw_data, symbolize_names: true)
-    @students = yaml_data.map { |student_data| Student.new(**student_data) }
+  def from(file)
+      text = file.read
+      students = YAML.safe_load(text, permitted_classes: [Data, Symbol]).map{|data| Student.new(**data)}
+      return students
   end
 
-  def serialize_data
-    @students.map(&:to_h).to_yaml
+  def to(list_students, file)
+      data = list_students.map{|x| x.to_h}
+      file.write(data.to_yaml)
   end
 end
