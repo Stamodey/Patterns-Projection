@@ -1,15 +1,18 @@
-require 'json'
+require_relative 'student'
 require_relative 'students_list'
+require_relative 'student_short'
+require 'json'
 
-class StudentsListJSON < StudentsList
-  private
+class Student_list_JSON < Data_storage_strategy
 
-  def parse_data(raw_data)
-    json_data = JSON.parse(raw_data, symbolize_names: true)
-    @students = json_data.map { |student_data| Student.new(**student_data) }
+  def from(file)
+      text = file.read
+      students = JSON.parse(text, symbolize_names: true).map{|data| Student.new(**data)}
+      return students
   end
-
-  def serialize_data
-    @students.map(&:to_h).to_json
+    
+  def to(list_students, file)
+      data = list_students.map{|x| x.to_h}
+      file.write(JSON.pretty_generate(data))
   end
 end
