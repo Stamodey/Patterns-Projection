@@ -1,80 +1,94 @@
+require_relative 'student_short'
 require_relative 'student'
 require_relative 'data_list_student_short'
 
-class StudentsList
-  attr_reader :students, :file_path
-
-  def initialize(file_path)
-    @file_path = file_path
-    @students = []
-    read_file
+class StudentList
+  def initialize(file, data_storage_strategy)
+    @file = file
+    self.data_storage_strategy = data_storage_strategy
+    @array = read()
   end
 
-  def read_file
-    raw_data = File.read(@file_path)
-    parse_data(raw_data)
+  def data_storage_strategy= (data_storage_strategy)
+    @data_storage_strategy = data_storage_strategy
   end
 
-  def write_file
-    File.write(@file_path, serialize_data)
+  def read()
+    begin
+      file = File.open(@file,"r")
+    rescue => e
+      puts e
+    end
+    array = from(file)
+    file.close()
+    return array
+  end
+  
+  def from(file)
+    @data_storage_strategy.from(file)
   end
 
-  def get_student_by_id(student_id)
-    @students.find { |student| student.student_id == student_id }
+  def write(list_students)
+    begin
+      file = File.open(@file,"w")
+    rescue => e
+      puts e
+    end
+    to(list_students, file)
+    file.close()
+  end  
+
+  def to(list_students, file)
+    @data_storage_strategy.to(list_students, file)
+  end
+
+  def search_on_id(number)
+    return @array.select(){|x| x.id == number}
+  end
+
+  def get_k_n_student_short_list(k, n, data_list = nil)
+    raise "Нет такого количества объктов n" if n > @array.size()
+    qty = (@array.size()/n).to_i
+    raise "Нет такого количества страниц" if k > qty
+
+    students_short = []
+
+    for index in 0...n
+      item = @array[(k-1)*n + index]
+      if (item != nil) 
+        std = StudentShort.new(item) 
+      else 
+        next
+      end
+      std.id = index
+      students_short << std
+    end
+
+    return Data_list_student_short.new(StudentShort)
+
+  end
+
+  def sort_by_lastname_and_initals()
+    @array.sort_by{|x| x.last_name_and_initials}
   end
 
   def add_student(student)
-    student.student_id = generate_new_id
-    @students << student
-    write_file
+    max_id = @array.max_by{|x| x.id}
+    id = 0
+    id = max_id 1 if !max_id
+    student.id = id
+    @array << student
   end
 
-  def update_student(student_id, new_student)
-    index = @students.index { |student| student.student_id == student_id }
-    return unless index
-
-    @students[index] = new_student
-    write_file
+  def replace_student_by_id(id, student)
+    @array.select{|x| x.id == id}.map{|x| x = student} 
   end
 
-  def delete_student(student_id)
-    @students.reject! { |student| student.student_id == student_id }
-    write_file
+  def delete_student_by_id(id)
+    @array.delete_if{|x| x.id == id}
   end
 
-  def get_k_n_student_short_list(k, n, existing_data_list = nil)
-    students_slice = @students.each_slice(n).to_a[k - 1]
-    short_students = students_slice.map { |student| StudentShort.create_from_student(student) }
-    if existing_data_list
-      existing_data_list.replace_data(short_students)
-      existing_data_list
-    else
-      Data_list_student_short.new(short_students)
-    end
-  end
-
-  def sort_by_last_name_initials
-    @students.sort_by! { |student| [student.last_name, student.first_name[0], student.middle_name[0]] }
-  end
-
-  def student_count
-    @students.size
-  end
-
-  private
-
-  def generate_new_id
-    max_id = @students.map(&:student_id).max || 0
-    max_id = max_id.to_i
-    max_id + 1
-  end
-
-  # Методы для реализации в подклассах
-  def parse_data(_raw_data)
-    raise NotImplementedError, 'Метод parse_data должен быть реализован в подклассе'
-  end
-
-  def serialize_data
-    raise NotImplementedError, 'Метод serialize_data должен быть реализован в подклассе'
+  def get_student_short_count()
+    @array.size()
   end
 end
