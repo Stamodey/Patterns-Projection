@@ -24,10 +24,6 @@ class StudentList
     return array
   end
   
-  def from(file)
-    @data_storage_strategy.from(file)
-  end
-
   def write(list_students)
     begin
       file = File.open(@file,"w")
@@ -38,13 +34,10 @@ class StudentList
     file.close()
   end  
 
-  def to(list_students, file)
-    @data_storage_strategy.to(list_students, file)
-  end
-
   def search_on_id(number)
     return @array.select(){|x| x.id == number}
   end
+    
 
   def get_k_n_student_short_list(k, n, data_list = nil)
     raise "Нет такого количества объктов n" if n > @array.size()
@@ -63,16 +56,18 @@ class StudentList
       std.id = index
       students_short << std
     end
-
     return Data_list_student_short.new(StudentShort)
-
   end
 
   def sort_by_lastname_and_initals()
     @array.sort_by{|x| x.last_name_and_initials}
   end
 
-  def add_student(student)
+  def add_student(Student)
+
+    duplicate = @array.include?(student) 
+    raise "Студент с такими данными уже существует" if duplicate
+
     max_id = @array.max_by{|x| x.id}
     id = 0
     id = max_id 1 if !max_id
@@ -91,4 +86,15 @@ class StudentList
   def get_student_short_count()
     @array.size()
   end
+
+  private 
+
+  def from(file)
+    @data_storage_strategy.from(file)
+  end
+
+  def to(list_students, file)
+    @data_storage_strategy.to(list_students, file)
+  end
+
 end
